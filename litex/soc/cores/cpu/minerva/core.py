@@ -30,6 +30,5 @@ class Minerva(Module):
                 self.cpu.ibus.connect(self.ibus),
                 self.cpu.dbus.connect(self.dbus)
             ]
-        except:
+        except ModuleNotFoundError:
             pass
-
