@@ -2,8 +2,6 @@
 
 	.global _start
 _start:
-	j reset_vector
-
 reset_vector:
 	la sp, _fstack
 	la t0, trap_vector
