@@ -12,6 +12,20 @@ from litex.soc.interconnect import csr
 # TODO: rewrite without FlipFlop
 
 
+class Cycle:
+    CLASSIC   = 0
+    CONSTANT  = 1
+    INCREMENT = 2
+    END       = 7
+
+
+class Burst:
+    LINEAR    = 0
+    WRAP_4    = 1
+    WRAP_8    = 2
+    WRAP_16   = 3
+
+
 _layout = [
     ("adr",             30, DIR_M_TO_S),
     ("dat_w", "data_width", DIR_M_TO_S),
@@ -648,21 +662,40 @@ class SRAM(Module):
         # memory
         port = self.mem.get_port(write_capable=not read_only, we_granularity=8)
         self.specials += self.mem, port
+
         # generate write enable signal
         if not read_only:
             self.comb += [port.we[i].eq(self.bus.cyc & self.bus.stb & self.bus.we & self.bus.sel[i])
                 for i in range(bus_data_width//8)]
         # address and data
+        next_adr = Signal.like(self.bus.adr)
         self.comb += [
-            port.adr.eq(self.bus.adr[:len(port.adr)]),
+            Case(self.bus.bte, {
+                Burst.LINEAR:  next_adr.eq(self.bus.adr + 1),
+                Burst.WRAP_4:  next_adr.eq(Cat(self.bus.adr[:2] + 1, self.bus.adr[2:])),
+                Burst.WRAP_8:  next_adr.eq(Cat(self.bus.adr[:3] + 1, self.bus.adr[3:])),
+                Burst.WRAP_16: next_adr.eq(Cat(self.bus.adr[:4] + 1, self.bus.adr[4:])),
+            }),
+            If((self.bus.cti == Cycle.INCREMENT) & self.bus.ack,
+                port.adr.eq(next_adr[:len(port.adr)])
+            ).Else(
+                port.adr.eq(self.bus.adr[:len(port.adr)])
+            ),
             self.bus.dat_r.eq(port.dat_r)
         ]
         if not read_only:
-            self.comb += port.dat_w.eq(self.bus.dat_w),
+            self.comb += port.dat_w.eq(self.bus.dat_w)
+
         # generate ack
         self.sync += [
             self.bus.ack.eq(0),
-            If(self.bus.cyc & self.bus.stb & ~self.bus.ack,    self.bus.ack.eq(1))
+            If(self.bus.cyc & self.bus.stb,
+                Case(self.bus.cti, {
+                    Cycle.CLASSIC:   If(~self.bus.ack, self.bus.ack.eq(1)),
+                    Cycle.INCREMENT: self.bus.ack.eq(1),
+                    Cycle.END:       If(~self.bus.ack, self.bus.ack.eq(1)),
+                }).makedefault(Cycle.CLASSIC)
+            )
         ]
 
 
