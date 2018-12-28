@@ -26,7 +26,7 @@ from liteeth.core.mac import LiteEthMAC
 from liteeth.core import LiteEthUDPIPCore
 from liteeth.frontend.etherbone import LiteEthEtherbone
 
-from litescope import LiteScopeAnalyzer
+# from litescope import LiteScopeAnalyzer
 
 
 class SimPins(Pins):
@@ -123,7 +123,7 @@ class SimSoC(SoCSDRAM):
         with_sdram=False,
         with_ethernet=False,
         with_etherbone=False, etherbone_mac_address=0x10e2d5000000, etherbone_ip_address="192.168.1.50",
-        with_analyzer=False,
+        # with_analyzer=False,
         **kwargs):
         platform = Platform()
         sys_clk_freq = int(1e9/platform.default_clk_period)
@@ -193,14 +193,14 @@ class SimSoC(SoCSDRAM):
             self.submodules.etherbone = LiteEthEtherbone(self.etherbonecore.udp, 1234, mode="master")
             self.add_wb_master(self.etherbone.wishbone.bus)
 
-        # analyzer
-        if with_analyzer:
-            analyzer_signals = [
-                # FIXME: find interesting signals to probe
-                self.cpu.ibus,
-                self.cpu.dbus
-            ]
-            self.submodules.analyzer = LiteScopeAnalyzer(analyzer_signals, 512)
+        # # analyzer
+        # if with_analyzer:
+        #     analyzer_signals = [
+        #         # FIXME: find interesting signals to probe
+        #         self.cpu.ibus,
+        #         self.cpu.dbus
+        #     ]
+        #     self.submodules.analyzer = LiteScopeAnalyzer(analyzer_signals, 512)
 
 
 def main():
@@ -219,8 +219,8 @@ def main():
                         help="enable Ethernet support")
     parser.add_argument("--with-etherbone", action="store_true",
                         help="enable Etherbone support")
-    parser.add_argument("--with-analyzer", action="store_true",
-                        help="enable Analyzer support")
+    # parser.add_argument("--with-analyzer", action="store_true",
+                        # help="enable Analyzer support")
     parser.add_argument("--trace", action="store_true",
                         help="enable VCD tracing")
     args = parser.parse_args()
@@ -248,13 +248,13 @@ def main():
         with_sdram=args.with_sdram,
         with_ethernet=args.with_ethernet,
         with_etherbone=args.with_etherbone,
-        with_analyzer=args.with_analyzer,
+        # with_analyzer=args.with_analyzer,
         **soc_kwargs)
     builder_kwargs["csr_csv"] = "csr.csv"
     builder = Builder(soc, **builder_kwargs)
-    vns = builder.build(run=False, threads=args.threads, sim_config=sim_config, trace=args.trace)
-    if args.with_analyzer:
-        soc.analyzer.export_csv(vns, "analyzer.csv")
+    # vns = builder.build(run=False, threads=args.threads, sim_config=sim_config, trace=args.trace)
+    # if args.with_analyzer:
+        # soc.analyzer.export_csv(vns, "analyzer.csv")
     builder.build(build=False, threads=args.threads, sim_config=sim_config, trace=args.trace)
 
 

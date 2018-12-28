@@ -27,6 +27,7 @@ $(OBJS_SIM): %.o: $(SRC_DIR)/%.c
 .PHONY: sim
 sim: mkdir $(OBJS_SIM)
 	verilator -Wno-fatal -O3 $(CC_SRCS) --top-module dut --exe \
+		+1364-2005ext+v \
 		$(SRCS_SIM_CPP) $(OBJS_SIM) \
 		--top-module dut \
 		$(if $(THREADS), --threads $(THREADS),) \
