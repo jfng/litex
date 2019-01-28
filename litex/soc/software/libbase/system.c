@@ -5,7 +5,7 @@
 #endif
 
 #if defined (__vexriscv__)
-#include <csr-defs.h>
+#include <csr-defs-vexriscv.h>
 #endif
 
 #include <system.h>
