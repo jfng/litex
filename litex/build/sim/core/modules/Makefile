@@ -1,4 +1,4 @@
-MODULES = ethernet serial2console serial2tcp clocker
+MODULES = ethernet serial2console serial2tcp clocker jtagremote
 SHROBJS = $(MODULES:=.so)
 
 .PHONY: $(MODULES)

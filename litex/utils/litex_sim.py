@@ -69,6 +69,12 @@ _io = [
         Subsignal("sink_ready", SimPins()),
         Subsignal("sink_data", SimPins(8)),
     ),
+    ("jtag", 0,
+        Subsignal("tck", SimPins()),
+        Subsignal("tdi", SimPins()),
+        Subsignal("tdo", SimPins()),
+        Subsignal("tms", SimPins())
+    )
 ]
 
 
@@ -215,6 +221,7 @@ def main():
 
     sim_config = SimConfig(default_clk="sys_clk")
     sim_config.add_module("serial2console", "serial")
+    sim_config.add_module("jtagremote", "jtag", args={"port": 9824})
     if args.rom_init:
         soc_kwargs["integrated_rom_init"] = get_mem_data(args.rom_init)
     if not args.with_sdram:

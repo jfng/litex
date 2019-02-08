@@ -88,7 +88,7 @@ out:
 static int clocker_tick(void *sess)
 {
   struct session_s *s=(struct session_s*)sess;
-  *s->sys_clk = ~(*s->sys_clk);
+  *s->sys_clk = !(*s->sys_clk);
   return 0;
 }
 

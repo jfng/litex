@@ -135,6 +135,16 @@ _io = [
         Subsignal("crs", Pins("G14")),
         IOStandard("LVCMOS33"),
     ),
+
+    ("jtag", 0,
+        Subsignal("tms", Pins("E15")),
+        Subsignal("tdi", Pins("E16")),
+        Subsignal("tdo", Pins("D15")),
+        Subsignal("tck", Pins("C15")),
+        IOStandard("LVCMOS33"),
+        Misc("PULLUP"),
+        Misc("SLEW=FAST")
+    )
 ]
 
 _connectors = [

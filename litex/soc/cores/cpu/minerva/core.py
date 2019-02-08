@@ -4,7 +4,6 @@ from migen import *
 
 from litex.soc.interconnect import wishbone
 
-
 class Minerva(Module):
     name = "minerva"
     endianness = "little"
@@ -20,6 +19,7 @@ class Minerva(Module):
         self.ibus = wishbone.Interface()
         self.dbus = wishbone.Interface()
         self.interrupt = Signal(32)
+        self.jtag = platform.request("jtag")
 
         ###
 
@@ -30,14 +30,26 @@ class Minerva(Module):
             "i_external_interrupt": self.interrupt,
             "i_timer_interrupt": 0,
 
+            # "o_ibus_adr": self.ibus.adr,
+            # "o_\\ibus_dat_w$12 ": self.ibus.dat_w,
+            # "o_\\ibus_sel$13 ": self.ibus.sel,
+            # "o_ibus_cyc": self.ibus.cyc,
+            # "o_ibus_stb": self.ibus.stb,
+            # "o_\\ibus_we$14 ": self.ibus.we,
+            # "o_ibus_cti": self.ibus.cti,
+            # "o_ibus_bte": self.ibus.bte,
+            # "i_ibus_dat_r": self.ibus.dat_r,
+            # "i_ibus_ack": self.ibus.ack,
+            # "i_ibus_err": self.ibus.err,
+
             "o_ibus_adr": self.ibus.adr,
-            "o_\\ibus_dat_w$7 ": self.ibus.dat_w,
-            "o_\\ibus_sel$8 ": self.ibus.sel,
+            "o_\\ibus_dat_w$17 ": self.ibus.dat_w,
+            "o_\\ibus_sel$18 ": self.ibus.sel,
             "o_ibus_cyc": self.ibus.cyc,
             "o_ibus_stb": self.ibus.stb,
-            "o_\\ibus_we$9 ": self.ibus.we,
-            "o_ibus_cti": self.ibus.cti,
-            "o_ibus_bte": self.ibus.bte,
+            "o_\\ibus_we$19 ": self.ibus.we,
+            "o_\\ibus_cti$16 ": self.ibus.cti,
+            "o_\\ibus_bte$15 ": self.ibus.bte,
             "i_ibus_dat_r": self.ibus.dat_r,
             "i_ibus_ack": self.ibus.ack,
             "i_ibus_err": self.ibus.err,
@@ -48,11 +60,16 @@ class Minerva(Module):
             "o_dbus_cyc": self.dbus.cyc,
             "o_dbus_stb": self.dbus.stb,
             "o_dbus_we": self.dbus.we,
-            "o_dbus_cti": self.dbus.cti,
-            "o_dbus_bte": self.dbus.bte,
+            "o_\\dbus_cti$21 ": self.dbus.cti,
+            "o_\\dbus_bte$20 ": self.dbus.bte,
             "i_dbus_dat_r": self.dbus.dat_r,
             "i_dbus_ack": self.dbus.ack,
-            "i_dbus_err": self.dbus.err
+            "i_dbus_err": self.dbus.err,
+
+            "i_jtag_tck": self.jtag.tck,
+            "i_jtag_tdi": self.jtag.tdi,
+            "o_jtag_tdo": self.jtag.tdo,
+            "i_jtag_tms": self.jtag.tms
         }
 
         vdir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "verilog")
